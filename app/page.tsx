@@ -1,3 +1,9 @@
+import { MainMenu } from "@/components/MainMenu";
+
 export default function Home() {
-  return "Hello World";
+  return (
+    <div>
+      <MainMenu />
+    </div>
+  );
 }

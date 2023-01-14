@@ -1,1 +1,17 @@
 @import "node_modules/modern-normalize/modern-normalize.css";
+
+:where(html) {
+  --black: black;
+  --white: white;
+
+  --primary-color: var(--black);
+  --background-color: var(--white);
+
+  --size-0: 0;
+  --size-1: 0.125rem;
+  --size-2: 0.25rem;
+  --size-3: 0.5rem;
+  --size-4: 1rem;
+  --size-3: 2rem;
+  --size-4: 4rem;
+}

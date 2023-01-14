@@ -1,0 +1,8 @@
+.menu {
+  width: 300px;
+  border: var(--size-2) solid var(--primary-color);
+  background: var(--background-color);
+  position: absolute;
+  right: var(--size-4);
+  top: var(--size-4);
+}
