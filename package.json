@@ -19,6 +19,7 @@
     "eslint-config-next": "13.1.2",
     "modern-normalize": "^1.1.0",
     "next": "13.1.2",
+    "perfect-freehand": "^1.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-youtube": "^10.1.0",

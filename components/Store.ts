@@ -1,5 +1,5 @@
 "use client";
-import { createClient, LiveObject } from "@liveblocks/client";
+import { createClient, LiveList, LiveObject } from "@liveblocks/client";
 import { createRoomContext } from "@liveblocks/react";
 
 const client = createClient({
@@ -25,10 +25,28 @@ export type GameSurface = {
   height: number;
 };
 
+export type Point = [number, number];
+
+export type Stroke = Point[];
+
+export type BrushStroke = {
+  pathData: string;
+  blurSize: number;
+};
+
+export type FogOfWar = {
+  enabled: boolean;
+  opacity: number;
+  brushSize: number;
+  blurSize: number;
+};
+
 export type Storage = {
   map: Map;
   grid: LiveObject<Grid>;
   gameSurface: LiveObject<GameSurface>;
+  fogOfWar: LiveObject<FogOfWar>;
+  brushStrokes: LiveList<BrushStroke>;
 };
 
 export const initialState: Storage = {
@@ -46,6 +64,13 @@ export const initialState: Storage = {
     width: 1280,
     height: 720,
   }),
+  fogOfWar: new LiveObject({
+    enabled: true,
+    opacity: 1,
+    brushSize: 32,
+    blurSize: 10,
+  }),
+  brushStrokes: new LiveList([]),
 };
 
 export const {

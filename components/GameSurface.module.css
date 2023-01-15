@@ -14,3 +14,9 @@
 .gridCanvas {
   background: transparent;
 }
+
+.fowPath {
+  --blur-size: 10px;
+
+  filter: blur(var(--blur-size));
+}

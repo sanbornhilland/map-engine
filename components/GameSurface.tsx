@@ -1,9 +1,16 @@
 "use client";
 import gameSurfaceStyles from "./GameSurface.module.css";
 
-import { useEffect, useRef } from "react";
+import { getStroke } from "perfect-freehand";
+import { PointerEventHandler, useEffect, useRef, useState } from "react";
 import YouTube from "react-youtube";
-import { GameSurface, Grid } from "./Store";
+import {
+  BrushStroke,
+  GameSurface,
+  Grid,
+  useMutation,
+  useStorage,
+} from "./Store";
 
 export type MapProps = {
   videoId: string;
@@ -108,6 +115,139 @@ export function Grid({ width, height, size, color, opacity }: GridProps) {
   );
 }
 
+export function getSvgPathFromStroke(stroke: number[][]) {
+  if (!stroke.length) {
+    return "";
+  }
+
+  const d = stroke.reduce(
+    (acc, [x0, y0], i, arr) => {
+      const [x1, y1] = arr[(i + 1) % arr.length];
+      acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
+      return acc;
+    },
+    ["M", ...stroke[0], "Q"]
+  );
+
+  d.push("Z");
+  return d.join(" ");
+}
+
+export type FogOfWarProps = {
+  width: number;
+  height: number;
+  brushSize: number;
+  blurSize: number;
+  brushStrokes: readonly BrushStroke[];
+};
+
+const options = {
+  size: 32,
+  thinning: 0,
+  smoothing: 0.5,
+  streamline: 0,
+};
+
+type PointInput = [number, number, number][];
+
+export type PathProps = {
+  pathData: string;
+};
+
+export function Path({ pathData }: PathProps) {
+  return (
+    <path d={pathData} fill="black" className={gameSurfaceStyles.fowPath} />
+  );
+}
+
+export function FogOfWar({
+  width,
+  height,
+  brushSize,
+  blurSize,
+  brushStrokes,
+}: FogOfWarProps) {
+  const [points, setPoints] = useState<PointInput>([]);
+
+  const addBrushStroke = useMutation(
+    ({ storage }, pathData: string, blurSize: number) => {
+      storage
+        .get("brushStrokes")
+        .insert({ pathData, blurSize }, storage.get("brushStrokes").length);
+    },
+    []
+  );
+
+  const handlePointerDown: PointerEventHandler<SVGElement> = (event) => {
+    // @ts-expect-error
+    event.target.setPointerCapture(event.pointerId);
+
+    setPoints([[event.pageX, event.pageY, event.pressure], ...points]);
+  };
+
+  const handlePointerMove: PointerEventHandler<SVGElement> = (event) => {
+    if (event.buttons !== 1) {
+      return;
+    }
+    setPoints([...points, [event.pageX, event.pageY, event.pressure]]);
+  };
+
+  const handlePointerUp: PointerEventHandler<SVGElement> = () => {
+    const stroke = getStroke(points, { ...options, size: brushSize });
+
+    addBrushStroke(getSvgPathFromStroke(stroke), blurSize);
+
+    setPoints([]);
+  };
+
+  return (
+    <div>
+      <svg
+        preserveAspectRatio="none"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        style={{ touchAction: "none" }}
+        viewBox={`0 0 ${width} ${height}`}
+      >
+        <mask id="myMask">
+          <rect x="0" y="0" width={width} height={height} fill="white" />
+
+          {points.length !== 0 && (
+            <path
+              d={getSvgPathFromStroke(
+                getStroke(points, { ...options, size: brushSize })
+              )}
+              fill="black"
+              className={gameSurfaceStyles.fowPath}
+              style={{
+                // @ts-expect-error
+                ["--blur-size"]: `${blurSize}px`,
+              }}
+            />
+          )}
+          {brushStrokes.map((brushStroke, i) => {
+            return (
+              <path
+                key={i}
+                d={brushStroke.pathData}
+                fill="black"
+                className={gameSurfaceStyles.fowPath}
+                style={{
+                  // @ts-expect-error
+                  ["--blur-size"]: `${brushStroke.blurSize}px`,
+                }}
+              />
+            );
+          })}
+        </mask>
+
+        <rect width={width} height={height} mask="url(#myMask)" />
+      </svg>
+    </div>
+  );
+}
+
 export type GameSurfaceProps = {
   videoId?: string;
   grid: Grid;
@@ -115,6 +255,9 @@ export type GameSurfaceProps = {
 };
 
 export function GameSurface({ videoId, grid, gameSurface }: GameSurfaceProps) {
+  const fogOfWar = useStorage((storage) => storage.fogOfWar);
+  const brushStrokes = useStorage((storage) => storage.brushStrokes);
+
   return (
     <div
       className={gameSurfaceStyles.gameSurface}
@@ -143,6 +286,17 @@ export function GameSurface({ videoId, grid, gameSurface }: GameSurfaceProps) {
             opacity={grid.opacity}
             width={gameSurface.width}
             height={gameSurface.height}
+          />
+        ) : null}
+      </div>
+      <div className={gameSurfaceStyles.gameSurfaceComponent}>
+        {fogOfWar.enabled ? (
+          <FogOfWar
+            width={gameSurface.width}
+            height={gameSurface.height}
+            brushStrokes={brushStrokes}
+            brushSize={fogOfWar.brushSize}
+            blurSize={fogOfWar.blurSize}
           />
         ) : null}
       </div>

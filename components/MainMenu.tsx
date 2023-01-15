@@ -74,6 +74,74 @@ export function GridMenu() {
   );
 }
 
+export function FogOfWarMenu() {
+  const fogOfWar = useStorage((storage) => storage.fogOfWar);
+
+  const setFogOfWarEnabled = useMutation(({ storage }, enabled: boolean) => {
+    storage.get("fogOfWar").set("enabled", enabled);
+  }, []);
+
+  const setBrushSize = useMutation(({ storage }, size: number) => {
+    storage.get("fogOfWar").set("brushSize", size);
+  }, []);
+
+  const setBlurSize = useMutation(({ storage }, size: number) => {
+    storage.get("fogOfWar").set("blurSize", size);
+  }, []);
+
+  const resetFogOfWar = useMutation(({ storage }) => {
+    storage.get("brushStrokes").clear();
+  }, []);
+
+  return (
+    <div>
+      <h2>Fog Of War</h2>
+      <label>
+        Enabled
+        <input
+          type="checkbox"
+          checked={fogOfWar.enabled}
+          onChange={(event) => {
+            setFogOfWarEnabled(event.target.checked);
+          }}
+        />
+      </label>
+      <label>
+        Brush Size
+        <input
+          type="number"
+          value={fogOfWar.brushSize}
+          step={1}
+          min={1}
+          onChange={(event) => {
+            setBrushSize(Math.max(1, event.target.valueAsNumber));
+          }}
+        />
+      </label>
+      <label>
+        Blur Size
+        <input
+          type="number"
+          value={fogOfWar.blurSize}
+          step={1}
+          min={1}
+          onChange={(event) => {
+            setBlurSize(Math.max(1, event.target.valueAsNumber));
+          }}
+        />
+      </label>
+      <button
+        type="button"
+        onClick={() => {
+          resetFogOfWar();
+        }}
+      >
+        Reset
+      </button>
+    </div>
+  );
+}
+
 export function MainMenu() {
   const map = useStorage((storage) => storage.map);
   const [localMapVideoId, setLocalMapVideoId] = useState(map.videoId);
@@ -107,6 +175,7 @@ export function MainMenu() {
         <button type="submit">Add Map</button>
       </form>
       <GridMenu />
+      <FogOfWarMenu />
     </div>
   );
 }
