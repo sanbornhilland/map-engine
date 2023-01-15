@@ -10,7 +10,7 @@ export type Presence = {
   name: string;
 };
 
-export type Map = LiveObject<{ url: string }>;
+export type Map = LiveObject<{ videoId: string }>;
 
 export type Storage = {
   map: Map;
@@ -18,7 +18,7 @@ export type Storage = {
 
 export const initialState: Storage = {
   map: new LiveObject({
-    url: "",
+    videoId: "",
   }),
 };
 

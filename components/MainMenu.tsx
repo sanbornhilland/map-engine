@@ -5,14 +5,14 @@ import { useMutation, useStorage } from "./Store";
 
 export function MainMenu() {
   const map = useStorage((storage) => storage.map);
-  const [localMapUrl, setLocalMapUrl] = useState(map.url);
+  const [localMapVideoId, setLocalMapVideoId] = useState(map.videoId);
 
   useEffect(() => {
-    setLocalMapUrl(map.url);
-  }, [map.url]);
+    setLocalMapVideoId(map.videoId);
+  }, [map.videoId]);
 
-  const setMapUrl = useMutation(({ storage }, url: string) => {
-    storage.get("map").set("url", url);
+  const setMapUrl = useMutation(({ storage }, videoId: string) => {
+    storage.get("map").set("videoId", videoId);
   }, []);
 
   return (
@@ -21,15 +21,15 @@ export function MainMenu() {
         onSubmit={(event) => {
           event.preventDefault();
 
-          setMapUrl(localMapUrl);
+          setMapUrl(localMapVideoId);
         }}
       >
         <label>
-          Map URL
+          Youtube Video ID
           <input
-            value={localMapUrl}
+            value={localMapVideoId}
             onChange={(event) => {
-              setLocalMapUrl(event.target.value);
+              setLocalMapVideoId(event.target.value);
             }}
           />
         </label>
