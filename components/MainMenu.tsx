@@ -89,6 +89,10 @@ export function FogOfWarMenu() {
     storage.get("fogOfWar").set("blurSize", size);
   }, []);
 
+  const setOpacity = useMutation(({ storage }, opacity: number) => {
+    storage.get("fogOfWar").set("opacity", opacity);
+  }, []);
+
   const resetFogOfWar = useMutation(({ storage }) => {
     storage.get("brushStrokes").clear();
   }, []);
@@ -127,6 +131,19 @@ export function FogOfWarMenu() {
           min={1}
           onChange={(event) => {
             setBlurSize(Math.max(1, event.target.valueAsNumber));
+          }}
+        />
+      </label>
+      <label>
+        Opacity
+        <input
+          type="number"
+          value={fogOfWar.opacity * 100}
+          step={1}
+          min={0}
+          max={100}
+          onChange={(event) => {
+            setOpacity(Math.max(0, event.target.valueAsNumber / 100));
           }}
         />
       </label>

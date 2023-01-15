@@ -139,6 +139,7 @@ export type FogOfWarProps = {
   brushSize: number;
   blurSize: number;
   brushStrokes: readonly BrushStroke[];
+  opacity: number;
 };
 
 const options = {
@@ -166,6 +167,7 @@ export function FogOfWar({
   brushSize,
   blurSize,
   brushStrokes,
+  opacity,
 }: FogOfWarProps) {
   const [points, setPoints] = useState<PointInput>([]);
 
@@ -201,7 +203,7 @@ export function FogOfWar({
   };
 
   return (
-    <div>
+    <div style={{ opacity }}>
       <svg
         preserveAspectRatio="none"
         onPointerDown={handlePointerDown}
@@ -297,6 +299,7 @@ export function GameSurface({ videoId, grid, gameSurface }: GameSurfaceProps) {
             brushStrokes={brushStrokes}
             brushSize={fogOfWar.brushSize}
             blurSize={fogOfWar.blurSize}
+            opacity={fogOfWar.opacity}
           />
         ) : null}
       </div>
