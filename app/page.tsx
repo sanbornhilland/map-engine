@@ -5,11 +5,17 @@ import { useStorage } from "@/components/Store";
 
 export default function Home() {
   const map = useStorage((storage) => storage.map);
+  const grid = useStorage((storage) => storage.grid);
+  const gameSurface = useStorage((storage) => storage.gameSurface);
 
   return (
     <div>
       <MainMenu />
-      <GameSurface videoId={map.videoId} />
+      <GameSurface
+        videoId={map.videoId}
+        gameSurface={gameSurface}
+        grid={grid}
+      />
     </div>
   );
 }
