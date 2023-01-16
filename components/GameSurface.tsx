@@ -11,6 +11,7 @@ import {
   useMutation,
   useStorage,
 } from "./Store";
+import { isViewer } from "./utils";
 
 export type MapProps = {
   videoId: string;
@@ -299,7 +300,7 @@ export function GameSurface({ videoId, grid, gameSurface }: GameSurfaceProps) {
             brushStrokes={brushStrokes}
             brushSize={fogOfWar.brushSize}
             blurSize={fogOfWar.blurSize}
-            opacity={fogOfWar.opacity}
+            opacity={isViewer() ? 1 : fogOfWar.opacity}
           />
         ) : null}
       </div>
